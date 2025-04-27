@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment (if you made one earlier)
+venv/
+
+# Docker
+*.env
+*.log
+
+# OS
+.DS_Store
+
+# VSCode (if you use it)
+.vscode/
