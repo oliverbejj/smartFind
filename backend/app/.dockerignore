@@ -1,0 +1,22 @@
+# Ignore Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore test files
+tests/
+test_data/
+*.pdf
+
+# Ignore Git repo stuff
+.git/
+.gitignore
+
+# Ignore local dev environment
+.env
+venv/
+*.env
+
+# Ignore Dockerfiles at higher levels if any
+Dockerfile
+docker-compose.yml
