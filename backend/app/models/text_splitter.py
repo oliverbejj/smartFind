@@ -2,7 +2,7 @@ from typing import List
 
 
 # v1
-def split_text_into_chunks(text: str, chunk_size: int = 500) -> List[str]:
+def split_text_into_chunks(text: str, chunk_size: int = 80) -> List[str]:
     """
     Splits a large string of text into smaller chunks by word count.
 
