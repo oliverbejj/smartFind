@@ -1,9 +1,9 @@
 # document_processing_service.py
 
-from backend.app.models.pdf_reader import extract_text_from_pdf
-from backend.app.models.text_splitter import split_text_into_chunks
-from backend.app.models.embedder import generate_embeddings
-from backend.app.services.memory_storage_service import MemoryStorageService
+from app.models.pdf_reader import extract_text_from_pdf
+from app.models.text_splitter import split_text_into_chunks
+from app.models.embedder import generate_embeddings
+from app.services.memory_storage_service import MemoryStorageService
 from pathlib import Path
 
 def process_document(
@@ -41,4 +41,4 @@ def process_document(
             chunk_index=i
         )
 
-    print(f"✅ Processed and stored {len(chunks)} chunks from '{document_name}'.")
+    print(f"Processed and stored {len(chunks)} chunks from '{document_name}'.")

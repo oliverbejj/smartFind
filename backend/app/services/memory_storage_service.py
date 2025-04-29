@@ -2,13 +2,21 @@ from typing import List, Dict, Any
 import uuid
 import math
 
+
+# Singleton: ACTUALLY USING SOMETHING UNIVERSITY TAUGHT ME LMAO
 class MemoryStorageService:
     """
     In-memory storage for text chunks and their embeddings.
     """
+    _instance = None
+    storage: List[Dict[str, Any]]
+    
 
-    def __init__(self) -> None:
-        self.storage: List[Dict[str, Any]] = []
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(MemoryStorageService, cls).__new__(cls)
+            cls._instance.storage = []
+        return cls._instance
 
     def add_chunk(
         self,

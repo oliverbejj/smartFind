@@ -1,5 +1,5 @@
 from openai import OpenAI
-from backend.app.core.config import OPENAI_API_KEY
+from app.core.config import OPENAI_API_KEY
 from typing import List
 
 client = OpenAI(api_key=OPENAI_API_KEY)
