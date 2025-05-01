@@ -1,3 +1,41 @@
+################
+# 
+# 
+# 
+# 
+# This is outdated (I dont use it in the current version of the app), but keep it in case I want to use it in the future for citing sources or something
+################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 from fastapi import APIRouter, HTTPException # type: ignore
 from pydantic import BaseModel # type: ignore
 from typing import List

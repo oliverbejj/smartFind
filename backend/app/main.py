@@ -1,5 +1,5 @@
 from fastapi import FastAPI # type: ignore
-from app.routers import upload_router, search_router, system_router
+from app.routers import upload_router, search_router, system_router, answer_router
 
 # Create FastAPI app
 app = FastAPI(
@@ -24,4 +24,5 @@ app.add_middleware(
 # Include routers
 app.include_router(system_router.router, prefix="", tags=["System"])
 app.include_router(upload_router.router, prefix="/upload", tags=["Upload"])
-app.include_router(search_router.router, prefix="/search", tags=["Search"])
+#app.include_router(search_router.router, prefix="/search", tags=["Search"]) ####Check router file to see why it's commented out 
+app.include_router(answer_router.router, prefix="/answer", tags=["Answer"])
