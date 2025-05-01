@@ -7,7 +7,7 @@ from pathlib import Path
 def process_document(
     file_path: str,
     storage: MemoryStorageService,
-    chunk_size: int = 80
+    max_chunk_chars: int = 500
 ) -> None:
     """
     Full pipeline: Process a document and store its chunks and embeddings.
@@ -22,7 +22,7 @@ def process_document(
     full_text = "\n".join(pages)
 
     # Split text into chunks
-    chunks = split_text_into_chunks(full_text, chunk_size=chunk_size)
+    chunks = split_text_into_chunks(full_text, max_chunk_chars=max_chunk_chars)
 
     # Generate embeddings
     embeddings = generate_embeddings(chunks)
