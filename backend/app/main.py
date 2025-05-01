@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI # type: ignore
 from app.routers import upload_router, search_router, system_router
 
 # Create FastAPI app
@@ -7,6 +7,19 @@ app = FastAPI(
     description="AI-powered document search engine.",
     version="1.0.0"
 )
+
+
+
+from fastapi.middleware.cors import CORSMiddleware # type: ignore
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # Include routers
 app.include_router(system_router.router, prefix="", tags=["System"])

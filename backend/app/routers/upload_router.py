@@ -1,5 +1,5 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, UploadFile, File, HTTPException # type: ignore
+from fastapi.responses import JSONResponse # type: ignore
 from app.services.document_processing_service import process_document
 from app.services.memory_storage_service import MemoryStorageService
 import shutil

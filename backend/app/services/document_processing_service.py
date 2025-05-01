@@ -1,5 +1,3 @@
-# document_processing_service.py
-
 from app.models.pdf_reader import extract_text_from_pdf
 from app.models.text_splitter import split_text_into_chunks
 from app.models.embedder import generate_embeddings

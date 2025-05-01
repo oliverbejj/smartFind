@@ -90,8 +90,13 @@ class MemoryStorageService:
         scored_chunks.sort(key=lambda x: x[0], reverse=True)
 
         # Return the top_k entries
-        top_matches = [entry for _, entry in scored_chunks[:top_k]]
-        return top_matches
+        top_matches = scored_chunks[:top_k]  # still a list of (score, chunk)
+
+        return [
+        {
+            **match[1],  # the chunk dictionary
+            "score": match[0],  # the similarity score
+        }for match in top_matches]
 
 
     def _cosine_similarity(self, vec1: List[float], vec2: List[float]) -> float:

@@ -1,4 +1,4 @@
-from openai import OpenAI
+from openai import OpenAI # type: ignore
 from app.core.config import OPENAI_API_KEY
 from typing import List
 

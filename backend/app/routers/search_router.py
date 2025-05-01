@@ -1,5 +1,5 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException # type: ignore
+from pydantic import BaseModel # type: ignore
 from typing import List
 from app.services.memory_storage_service import MemoryStorageService
 from app.models.embedder import generate_embeddings
@@ -19,6 +19,7 @@ class SearchResult(BaseModel):
     document_name: str
     chunk_index: int
     text: str
+    score: float
 
 
 @router.post("/", response_model=List[SearchResult])
@@ -41,6 +42,7 @@ def semantic_search(payload: SearchRequest):
             document_name=m["document_name"],
             chunk_index=m["chunk_index"],
             text=m["text"],
+            score=m["score"],
         )
         for m in matches
     ]

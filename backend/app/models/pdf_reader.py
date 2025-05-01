@@ -1,4 +1,4 @@
-import fitz
+import fitz # type: ignore
 from typing import List
 
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter # type: ignore
 from app.services.memory_storage_service import MemoryStorageService
 
 router = APIRouter()
