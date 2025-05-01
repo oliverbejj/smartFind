@@ -18,9 +18,8 @@ function AnswerForm() {
     try {
       const response = await axios.post("http://localhost:8000/answer/", {
         query: question,
-        top_k: 3
+        top_k: 3,
       });
-
       setAnswer(response.data.answer);
     } catch (err: any) {
       setError("❌ Failed to generate answer. Try again.");
@@ -31,31 +30,53 @@ function AnswerForm() {
   };
 
   return (
-    <div className="bg-white p-6 rounded shadow max-w-md mx-auto my-8">
-      <h2 className="text-xl font-bold mb-4">Smart Answer</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Ask a question..."
-          className="w-full p-2 border border-gray-300 rounded mb-4"
-        />
-        <button
-          type="submit"
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        >
-          {loading ? "Thinking..." : "Ask"}
-        </button>
-      </form>
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-6 rounded-2xl shadow max-w-md mx-auto my-8 flex flex-col gap-4"
+    >
+      <h2 className="text-xl font-semibold">Smart Answer</h2>
 
-      {error && <p className="text-red-600 mt-4">{error}</p>}
+      <input
+        type="text"
+        value={question}
+        onChange={(e) => setQuestion(e.target.value)}
+        placeholder="Ask a question..."
+        disabled={loading}
+        className="p-2 border border-gray-300 rounded w-full"
+      />
+
+      <button
+        type="submit"
+        disabled={loading}
+        className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white font-medium ${
+          loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
+        }`}
+      >
+        {loading && (
+          <svg
+            className="w-4 h-4 animate-spin"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+          >
+            <circle className="opacity-25" cx="12" cy="12" r="10" strokeWidth="4" />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v8H4z"
+            />
+          </svg>
+        )}
+        {loading ? "Thinking..." : "Ask"}
+      </button>
+
+      {error && <p className="text-red-600 text-sm">{error}</p>}
       {answer && (
-        <div className="mt-6 p-4 bg-gray-50 border rounded">
-          <p className="text-gray-800 whitespace-pre-line">{answer}</p>
+        <div className="p-4 bg-gray-50 border rounded text-gray-800 whitespace-pre-line">
+          {answer}
         </div>
       )}
-    </div>
+    </form>
   );
 }
 
