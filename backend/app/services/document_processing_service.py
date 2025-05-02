@@ -38,5 +38,6 @@ def process_document(
             document_name=document_name,
             chunk_index=i
         )
+    storage.register_document(document_name, num_chunks=len(chunks))
 
     print(f"Processed and stored {len(chunks)} chunks from '{document_name}'.")

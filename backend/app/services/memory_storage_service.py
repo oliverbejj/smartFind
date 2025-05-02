@@ -10,12 +10,14 @@ class MemoryStorageService:
     """
     _instance = None
     storage: List[Dict[str, Any]]
+    documents: Dict[str, Dict[str, Any]]
     
 
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(MemoryStorageService, cls).__new__(cls)
             cls._instance.storage = []
+            cls._instance.documents = {}
         return cls._instance
 
     def add_chunk(
@@ -47,6 +49,28 @@ class MemoryStorageService:
         self.storage.append(entry)
         return entry["id"]
 
+
+
+    def register_document(self, name: str, num_chunks: int):
+        """
+        Adds a document record to the document registry.
+        """
+        self.documents[name] = {
+            "name": name,
+            "num_chunks": num_chunks
+        }
+
+    def list_documents(self) -> List[Dict[str, Any]]:
+        """
+        Returns metadata for all uploaded documents.
+
+        Returns:
+            List[Dict[str, Any]]: List of documents.
+        """
+        return list(self.documents.values())
+
+
+    
     def get_all_chunks(self) -> List[Dict[str, Any]]:
         """
         Returns all stored chunk entries.

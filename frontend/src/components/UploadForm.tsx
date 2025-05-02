@@ -1,7 +1,14 @@
 import { useState } from "react";
 import axios from "axios";
 
-function UploadForm() {
+
+
+
+type UploadFormProps = {
+  onUploadSuccess: () => void;
+};
+
+function UploadForm({ onUploadSuccess }: UploadFormProps) {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -21,6 +28,8 @@ function UploadForm() {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setMessage(`${response.data.message}`);
+      setFile(null);
+      onUploadSuccess();
     } catch (err) {
       setMessage("❌ Upload failed.");
     } finally {
