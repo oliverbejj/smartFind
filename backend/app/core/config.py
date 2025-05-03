@@ -10,7 +10,7 @@ if not OPENAI_API_KEY:
 
 
 class Settings:
-    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./db.sqlite3")
+    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./data/db.sqlite3")
 
 settings = Settings()
 

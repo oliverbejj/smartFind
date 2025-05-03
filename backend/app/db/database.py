@@ -4,7 +4,7 @@ from app.db.models import Base
 from app.core.config import settings  # type: ignore
 
 # SQLite for now
-SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL  # e.g., sqlite:///./db.sqlite3
+SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL  
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
