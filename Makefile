@@ -1,9 +1,11 @@
 # Build and run the backend container
 up:
+	docker-compose down
 	docker-compose up --build
 
 # Run without rebuilding (faster if no Dockerfile/requirements changes)
 start:
+	docker-compose down
 	docker-compose up
 
 # Stop the running container

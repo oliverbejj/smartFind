@@ -2,14 +2,17 @@ import { useState, useEffect } from "react";
 import UploadForm from "./components/UploadForm";
 import DocumentList from "./components/DocumentList";
 import AnswerForm from "./components/AnswerForm";
-import axios from "axios";
+import { DocumentsService } from "./api-client";
+import { DocumentOut } from "./api-client";
+
+
 
 function App() {
-  const [documents, setDocuments] = useState([]);
+  const [documents, setDocuments] = useState<DocumentOut[]>([]);
 
   const fetchDocuments = async () => {
-    const res = await axios.get("http://localhost:8000/documents");
-    setDocuments(res.data);
+    const docs = await DocumentsService.listDocumentsDocumentsGet();
+    setDocuments(docs);
   };
 
   useEffect(() => {

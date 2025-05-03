@@ -1,5 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
+import { useRef } from "react";
+
 
 
 
@@ -12,6 +14,8 @@ function UploadForm({ onUploadSuccess }: UploadFormProps) {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +33,9 @@ function UploadForm({ onUploadSuccess }: UploadFormProps) {
       });
       setMessage(`${response.data.message}`);
       setFile(null);
+      if (inputRef.current) {
+        inputRef.current.value = "";  
+      }
       onUploadSuccess();
     } catch (err) {
       setMessage("❌ Upload failed.");
@@ -45,6 +52,7 @@ function UploadForm({ onUploadSuccess }: UploadFormProps) {
       <h2 className="text-xl font-semibold">Upload a PDF</h2>
 
       <input
+        ref={inputRef}
         type="file"
         accept=".pdf"
         onChange={(e) => setFile(e.target.files?.[0] || null)}

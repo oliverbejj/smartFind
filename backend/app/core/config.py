@@ -7,3 +7,10 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 if not OPENAI_API_KEY:
     raise ValueError("OPENAI_API_KEY is missing. Please check your .env file.")
+
+
+class Settings:
+    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./db.sqlite3")
+
+settings = Settings()
+

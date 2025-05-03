@@ -1,20 +1,27 @@
 from fastapi import APIRouter # type: ignore
 from pydantic import BaseModel # type: ignore
 from typing import List
-from app.services.memory_storage_service import MemoryStorageService
+from app.services.db_storage_service import DBStorageService
 
 router = APIRouter()
-memory = MemoryStorageService()
+storage = DBStorageService()
 
-
-class DocumentInfo(BaseModel):
+class DocumentOut(BaseModel):
+    id: str
     name: str
-    num_chunks: int
+    uploaded_at: str
+    chunk_count: int
+    
 
-
-@router.get("/", response_model=List[DocumentInfo])
-def get_documents():
-    """
-    Returns a list of uploaded documents and their metadata.
-    """
-    return memory.list_documents()
+@router.get("/", response_model=List[DocumentOut])
+def list_documents():
+    docs = storage.list_documents()
+    return [
+        DocumentOut(
+            id=str(doc.id),
+            name=doc.name,
+            uploaded_at=doc.uploaded_at.isoformat(),
+            chunk_count=len(doc.chunks)
+        )
+        for doc in docs
+    ]
