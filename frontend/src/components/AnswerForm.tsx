@@ -1,15 +1,31 @@
-import { useState } from "react";
+import { useState, forwardRef, useImperativeHandle } from "react";
 import axios from "axios";
 
-function AnswerForm() {
+type AnswerFormProps = {
+  chatId: string;
+};
+
+export type AnswerFormHandle = {
+  reset: () => void;
+};
+
+const AnswerForm = forwardRef<AnswerFormHandle, AnswerFormProps>(({ chatId }, ref) => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  useImperativeHandle(ref, () => ({
+    reset: () => {
+      setQuestion("");
+      setAnswer("");
+      setError("");
+    },
+  }));
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!question.trim()) return;
+    if (!question.trim() || !chatId) return;
 
     setLoading(true);
     setAnswer("");
@@ -19,8 +35,10 @@ function AnswerForm() {
       const response = await axios.post("http://localhost:8000/answer/", {
         query: question,
         top_k: 3,
+        chat_session_id: chatId,
       });
       setAnswer(response.data.answer);
+      setQuestion(""); // clear input field
     } catch (err: any) {
       setError("❌ Failed to generate answer. Try again.");
       console.error(err);
@@ -78,6 +96,6 @@ function AnswerForm() {
       )}
     </form>
   );
-}
+});
 
 export default AnswerForm;

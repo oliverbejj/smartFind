@@ -2,17 +2,17 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { DocumentOut } from '../models/DocumentOut';
+import type { app__routers__document_router__DocumentOut } from '../models/app__routers__document_router__DocumentOut';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class DocumentsService {
     /**
      * List Documents
-     * @returns DocumentOut Successful Response
+     * @returns app__routers__document_router__DocumentOut Successful Response
      * @throws ApiError
      */
-    public static listDocumentsDocumentsGet(): CancelablePromise<Array<DocumentOut>> {
+    public static listDocumentsDocumentsGet(): CancelablePromise<Array<app__routers__document_router__DocumentOut>> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/documents/',

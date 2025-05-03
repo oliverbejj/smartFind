@@ -2,9 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type AnswerRequest = {
-    query: string;
-    top_k?: number;
-    chat_session_id: string;
+export type ChatSessionOut = {
+    id: string;
+    name: string;
+    created_at: string;
 };
 

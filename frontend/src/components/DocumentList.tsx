@@ -1,4 +1,5 @@
-import { DocumentOut } from "../api-client/models/DocumentOut";
+import { app__routers__document_router__DocumentOut as DocumentOut } from "../api-client/models/app__routers__document_router__DocumentOut";
+
 
 
 type DocumentListProps = {

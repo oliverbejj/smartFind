@@ -6,9 +6,10 @@ import os
 
 from app.models.embedder import generate_embeddings
 from app.db import database, crud
-from app.db.models import Chunk
+from app.db.models import Chunk, Document
 from sqlalchemy.orm import Session # type: ignore
 import math
+from uuid import UUID
 
 router = APIRouter()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -17,6 +18,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 class AnswerRequest(BaseModel):
     query: str
     top_k: int = 3
+    chat_session_id: UUID
 
 
 class AnswerResponse(BaseModel):
@@ -36,7 +38,7 @@ def cosine_similarity(vec1: List[float], vec2: List[float]) -> float:
 def generate_answer(payload: AnswerRequest):
     db: Session = database.SessionLocal()
 
-    chunks: List[Chunk] = db.query(Chunk).all()
+    chunks: List[Chunk] = db.query(Chunk).join(Document).filter(Document.chat_session_id ==  payload.chat_session_id).all()
     if not chunks:
         raise HTTPException(status_code=404, detail="No chunks available for answering.")
 

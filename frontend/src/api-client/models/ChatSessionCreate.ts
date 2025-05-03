@@ -2,10 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type DocumentOut = {
-    id: string;
+export type ChatSessionCreate = {
     name: string;
-    uploaded_at: string;
-    chunk_count: number;
 };
 

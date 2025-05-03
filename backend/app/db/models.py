@@ -23,7 +23,11 @@ class Document(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
 
     user = relationship("User", back_populates="documents")
-    chunks = relationship("Chunk", back_populates="document")
+    chunks = relationship("Chunk", back_populates="document", cascade="all, delete-orphan")
+
+    chat_session_id = Column(UUID(as_uuid=True), ForeignKey("chat_sessions.id"), nullable=False)
+    chat_session = relationship("ChatSession", back_populates="documents")
+
 
 
 class Chunk(Base):
@@ -35,3 +39,11 @@ class Chunk(Base):
     embedding = Column(JSON, nullable=False)
 
     document = relationship("Document", back_populates="chunks")
+
+class ChatSession(Base):
+    __tablename__ = "chat_sessions"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    documents = relationship("Document", back_populates="chat_session", cascade="all, delete-orphan")

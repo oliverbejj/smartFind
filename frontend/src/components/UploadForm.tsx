@@ -1,25 +1,20 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import axios from "axios";
-import { useRef } from "react";
-
-
-
-
 
 type UploadFormProps = {
   onUploadSuccess: () => void;
+  chatId: string;
 };
 
-function UploadForm({ onUploadSuccess }: UploadFormProps) {
+function UploadForm({ onUploadSuccess, chatId }: UploadFormProps) {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) return;
+    if (!file || !chatId) return;
 
     setLoading(true);
     setMessage(null);
@@ -28,14 +23,14 @@ function UploadForm({ onUploadSuccess }: UploadFormProps) {
     formData.append("file", file);
 
     try {
-      const response = await axios.post("http://localhost:8000/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await axios.post(
+        `http://localhost:8000/upload/?chat_session_id=${chatId}`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
       setMessage(`${response.data.message}`);
       setFile(null);
-      if (inputRef.current) {
-        inputRef.current.value = "";  
-      }
+      if (inputRef.current) inputRef.current.value = "";
       onUploadSuccess();
     } catch (err) {
       setMessage("❌ Upload failed.");
@@ -67,7 +62,7 @@ function UploadForm({ onUploadSuccess }: UploadFormProps) {
           loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
         }`}
       >
-        {loading && (
+        {loading ? (
           <svg
             className="w-4 h-4 animate-spin"
             viewBox="0 0 24 24"
@@ -81,7 +76,7 @@ function UploadForm({ onUploadSuccess }: UploadFormProps) {
               d="M4 12a8 8 0 018-8v8H4z"
             />
           </svg>
-        )}
+        ) : null}
         {loading ? "Processing..." : "Upload"}
       </button>
 

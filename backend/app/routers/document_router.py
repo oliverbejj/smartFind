@@ -1,4 +1,4 @@
-from fastapi import APIRouter # type: ignore
+from fastapi import APIRouter, HTTPException # type: ignore
 from pydantic import BaseModel # type: ignore
 from typing import List
 from app.services.db_storage_service import DBStorageService
@@ -25,3 +25,12 @@ def list_documents():
         )
         for doc in docs
     ]
+
+
+@router.delete("/{doc_id}")
+def delete_document(doc_id: str):
+    try:
+        storage.delete_document(doc_id)
+        return {"message": f"Document {doc_id} deleted successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

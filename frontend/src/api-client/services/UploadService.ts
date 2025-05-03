@@ -9,16 +9,21 @@ import { request as __request } from '../core/request';
 export class UploadService {
     /**
      * Upload Document
+     * @param chatSessionId
      * @param formData
      * @returns any Successful Response
      * @throws ApiError
      */
     public static uploadDocumentUploadPost(
+        chatSessionId: string,
         formData: Body_upload_document_upload__post,
     ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/upload/',
+            query: {
+                'chat_session_id': chatSessionId,
+            },
             formData: formData,
             mediaType: 'multipart/form-data',
             errors: {
