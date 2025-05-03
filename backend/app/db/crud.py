@@ -25,3 +25,7 @@ def list_documents(db: Session):
 
 def get_chunks_for_document(db: Session, document_id: uuid.UUID):
     return db.query(models.Chunk).filter(models.Chunk.document_id == document_id).all()
+
+def get_all_chunks(db: Session):
+    return db.query(models.Chunk).all()
+

@@ -1,6 +1,5 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException # type: ignore
 from fastapi.responses import JSONResponse # type: ignore
-from app.services.document_processing_service import process_document
 from app.services.db_storage_service import DBStorageService
 import shutil
 from pathlib import Path

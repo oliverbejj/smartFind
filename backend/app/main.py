@@ -1,5 +1,5 @@
 from fastapi import FastAPI # type: ignore
-from app.routers import upload_router, search_router, system_router, answer_router, document_router
+from app.routers import upload_router, system_router, answer_router, document_router
 from app.db.database import init_db
 
 
