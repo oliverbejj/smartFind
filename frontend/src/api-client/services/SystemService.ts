@@ -17,16 +17,4 @@ export class SystemService {
             url: '/health',
         });
     }
-    /**
-     * Reset Storage
-     * Clears all stored documents, embeddings, and chunks.
-     * @returns any Successful Response
-     * @throws ApiError
-     */
-    public static resetStorageResetPost(): CancelablePromise<any> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/reset',
-        });
-    }
 }
