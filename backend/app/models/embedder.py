@@ -1,8 +1,8 @@
 from openai import OpenAI # type: ignore
-from app.core.config import OPENAI_API_KEY
+from app.core.config import settings
 from typing import List
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 def generate_embeddings(
     chunks: List[str],

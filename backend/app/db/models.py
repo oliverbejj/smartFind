@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, String, DateTime, ForeignKey, Integer, JSON, Text # type: ignore
 from sqlalchemy.dialects.postgresql import UUID # type: ignore
 from sqlalchemy.orm import declarative_base, relationship # type: ignore
@@ -59,6 +59,8 @@ class ChatMessage(Base):
     chat_session_id = Column(UUID(as_uuid=True), ForeignKey("chat_sessions.id"), nullable=False)
     question = Column(Text, nullable=False)
     answer = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime(timezone=True),   
+                    default=lambda: datetime.now(timezone.utc))
+    sources = Column(Text, nullable=True)
 
     chat_session = relationship("ChatSession", back_populates="messages")

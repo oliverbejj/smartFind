@@ -1,16 +1,17 @@
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 
-load_dotenv()  # It looks for `.env` at project root automatically
-
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-if not OPENAI_API_KEY:
-    raise ValueError("OPENAI_API_KEY is missing. Please check your .env file.")
-
+load_dotenv()                       # loads .env if present
 
 class Settings:
-    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./data/db.sqlite3")
+    DATABASE_URL: str = os.getenv(
+        "DATABASE_URL",
+        "postgresql+psycopg2://smartfind:smartfind@db/smartfind",
+    )
+    OPENAI_API_KEY: str | None = os.getenv("OPENAI_API_KEY")
+
+    def __post_init__(self):
+        if not self.OPENAI_API_KEY:
+            raise ValueError("OPENAI_API_KEY is missing.")
 
 settings = Settings()
-

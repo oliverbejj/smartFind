@@ -1,19 +1,31 @@
 version: '3.9'
 
 services:
+  db:
+    image: postgres:16
+    container_name: smartfind-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: smartfind
+      POSTGRES_PASSWORD: smartfind
+      POSTGRES_DB: smartfind
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: smartfind-backend
+    depends_on:
+      - db
+    env_file:              
+      - .env
     ports:
       - "8000:8000"
     volumes:
-      - ./backend/app:/app/app  
+      - ./backend/app:/app/app
       - ./backend/requirements.txt:/app/requirements.txt
-      - ./data/sqlite:/app/data
-    env_file:
-      - .env
     restart: unless-stopped
 
   frontend:
@@ -21,8 +33,11 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: smartfind-frontend
-    ports:
-      - "5173:4173" 
     depends_on:
       - backend
+    ports:
+      - "5173:4173"
     restart: unless-stopped
+
+volumes:
+  pgdata:

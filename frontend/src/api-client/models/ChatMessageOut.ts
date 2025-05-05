@@ -7,5 +7,6 @@ export type ChatMessageOut = {
     question: string;
     answer: string;
     created_at: string;
+    sources?: Array<string>;
 };
 

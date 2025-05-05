@@ -38,6 +38,7 @@ class ChatMessageOut(BaseModel):
     question: str
     answer: str
     created_at: datetime
+    sources: List[str] = []
 
     class Config:
         orm_mode = True
@@ -92,4 +93,13 @@ def get_messages_for_chat(chat_id: UUID):
     if not chat:
         raise HTTPException(status_code=404, detail="Chat session not found.")
 
-    return sorted(chat.messages, key=lambda m: m.created_at)
+    return [
+    ChatMessageOut(
+        id=msg.id,
+        question=msg.question,
+        answer=msg.answer,
+        created_at=msg.created_at,
+        sources=msg.sources.split(", ") if msg.sources else []
+    )
+    for msg in sorted(chat.messages, key=lambda m: m.created_at)
+    ]

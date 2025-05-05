@@ -11,6 +11,7 @@ from app.db.models import Chunk, Document
 from sqlalchemy.orm import Session # type: ignore
 import math
 from uuid import UUID
+from datetime import datetime, timezone
 
 router = APIRouter()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -22,13 +23,12 @@ class AnswerRequest(BaseModel):
     chat_session_id: UUID
 
 
-from datetime import datetime
-
 class AnswerResponse(BaseModel):
     id: UUID
     question: str
     answer: str
     created_at: datetime
+    sources: List[str]
 
 
 
@@ -55,16 +55,27 @@ def generate_answer(payload: AnswerRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Embedding failed: {str(e)}")
 
-    # Score chunks
     scored = [
         (cosine_similarity(query_embedding, chunk.embedding), chunk)
         for chunk in chunks
     ]
     scored.sort(key=lambda x: x[0], reverse=True)
 
-    top_matches = [entry.text for _, entry in scored[:payload.top_k]]
+
+    top_chunks = scored[:payload.top_k]
+
+    top_matches = [entry.text for _, entry in top_chunks]
+
+    doc_names = list({chunk.document.name for _, chunk in top_chunks})
+
     if not top_matches:
-        return {"answer": "No relevant information found."}
+        return {
+            "id": UUID(int=0),
+            "question": payload.query,
+            "answer": "No relevant information found.",
+            "created_at": datetime.now(timezone.utc), 
+            "sources": [],
+        }
 
     context = "\n\n".join(top_matches)
 
@@ -87,20 +98,25 @@ Answer:"""
         )
         answer = response.choices[0].message.content.strip()
 
+        sources = ", ".join(doc_names)
+
         message = ChatMessage(
             chat_session_id=payload.chat_session_id,
             question=payload.query,
             answer=answer,
+            sources=sources,  
         )
+
         db.add(message)
         db.commit()
-        db.refresh(message)  # <- important to populate .id and .created_at
+        db.refresh(message)  
 
         return AnswerResponse(
             id=message.id,
             question=message.question,
             answer=message.answer,
-            created_at=message.created_at
+            created_at=message.created_at,
+            sources=doc_names
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"OpenAI request failed: {str(e)}")

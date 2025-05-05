@@ -1,17 +1,10 @@
 from sqlalchemy import create_engine # type: ignore
-from sqlalchemy.orm import sessionmaker # type: ignore
+from sqlalchemy.orm import sessionmaker   # type: ignore
 from app.db.models import Base
-from app.core.config import settings  # type: ignore
+from app.core.config import settings
 
-# SQLite for now
-SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL  
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False} if SQLALCHEMY_DATABASE_URL.startswith("sqlite") else {}
-)
-
+engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-def init_db():
+def init_db() -> None:
     Base.metadata.create_all(bind=engine)

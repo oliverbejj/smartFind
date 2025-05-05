@@ -3,6 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 export type AnswerResponse = {
+    id: string;
+    question: string;
     answer: string;
+    created_at: string;
+    sources: Array<string>;
 };
 
