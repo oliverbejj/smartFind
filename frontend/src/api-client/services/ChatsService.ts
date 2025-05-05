@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { app__routers__chat_router__DocumentOut } from '../models/app__routers__chat_router__DocumentOut';
+import type { ChatMessageOut } from '../models/ChatMessageOut';
 import type { ChatSessionCreate } from '../models/ChatSessionCreate';
 import type { ChatSessionOut } from '../models/ChatSessionOut';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -71,6 +72,26 @@ export class ChatsService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/chats/{chat_id}/documents',
+            path: {
+                'chat_id': chatId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Get Messages For Chat
+     * @param chatId
+     * @returns ChatMessageOut Successful Response
+     * @throws ApiError
+     */
+    public static getMessagesForChatChatsChatIdMessagesGet(
+        chatId: string,
+    ): CancelablePromise<Array<ChatMessageOut>> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/chats/{chat_id}/messages',
             path: {
                 'chat_id': chatId,
             },

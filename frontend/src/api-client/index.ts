@@ -12,6 +12,7 @@ export type { AnswerResponse } from './models/AnswerResponse';
 export type { app__routers__chat_router__DocumentOut } from './models/app__routers__chat_router__DocumentOut';
 export type { app__routers__document_router__DocumentOut } from './models/app__routers__document_router__DocumentOut';
 export type { Body_upload_document_upload__post } from './models/Body_upload_document_upload__post';
+export type { ChatMessageOut } from './models/ChatMessageOut';
 export type { ChatSessionCreate } from './models/ChatSessionCreate';
 export type { ChatSessionOut } from './models/ChatSessionOut';
 export type { HTTPValidationError } from './models/HTTPValidationError';

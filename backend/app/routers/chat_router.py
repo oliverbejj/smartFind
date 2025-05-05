@@ -7,6 +7,7 @@ from datetime import datetime
 from app.db import database
 from app.db.models import ChatSession, Document
 from sqlalchemy.orm import Session # type: ignore
+from app.db.models import ChatMessage
 
 router = APIRouter()
 db: Session = database.SessionLocal()
@@ -31,6 +32,15 @@ class DocumentOut(BaseModel):
     name: str
     uploaded_at: str
     chunk_count: int
+
+class ChatMessageOut(BaseModel):
+    id: UUID
+    question: str
+    answer: str
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
 
 
 
@@ -74,3 +84,12 @@ def get_documents_for_chat(chat_id: UUID):
         )
         for doc in chat.documents
     ]
+
+
+@router.get("/{chat_id}/messages", response_model=List[ChatMessageOut])
+def get_messages_for_chat(chat_id: UUID):
+    chat = db.query(ChatSession).filter(ChatSession.id == chat_id).first()
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat session not found.")
+
+    return sorted(chat.messages, key=lambda m: m.created_at)

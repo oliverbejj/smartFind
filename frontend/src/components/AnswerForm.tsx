@@ -1,15 +1,18 @@
 import { useState, forwardRef, useImperativeHandle } from "react";
 import axios from "axios";
+import { ChatMessageOut } from "../api-client/models/ChatMessageOut";
+
 
 type AnswerFormProps = {
   chatId: string;
+  onMessage: (msg: ChatMessageOut) => void;
 };
 
 export type AnswerFormHandle = {
   reset: () => void;
 };
 
-const AnswerForm = forwardRef<AnswerFormHandle, AnswerFormProps>(({ chatId }, ref) => {
+const AnswerForm = forwardRef<AnswerFormHandle, AnswerFormProps>(({ chatId, onMessage }, ref) => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,13 +35,23 @@ const AnswerForm = forwardRef<AnswerFormHandle, AnswerFormProps>(({ chatId }, re
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:8000/answer/", {
+      const response = await axios.post<ChatMessageOut>("http://localhost:8000/answer/", {
         query: question,
         top_k: 3,
         chat_session_id: chatId,
       });
-      setAnswer(response.data.answer);
-      setQuestion(""); // clear input field
+      
+      const newMessage = response.data;
+      setAnswer(newMessage.answer);
+      setQuestion("");
+      
+      onMessage(newMessage);
+      
+      const answer = response.data.answer;
+      setAnswer(answer);
+      setQuestion("");
+
+
     } catch (err: any) {
       setError("❌ Failed to generate answer. Try again.");
       console.error(err);

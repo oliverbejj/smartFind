@@ -3,6 +3,7 @@ from pydantic import BaseModel # type: ignore
 from typing import List
 from openai import OpenAI # type: ignore
 import os
+from app.db.models import Chunk, Document, ChatMessage
 
 from app.models.embedder import generate_embeddings
 from app.db import database, crud
@@ -21,8 +22,15 @@ class AnswerRequest(BaseModel):
     chat_session_id: UUID
 
 
+from datetime import datetime
+
 class AnswerResponse(BaseModel):
+    id: UUID
+    question: str
     answer: str
+    created_at: datetime
+
+
 
 
 def cosine_similarity(vec1: List[float], vec2: List[float]) -> float:
@@ -78,6 +86,21 @@ Answer:"""
             max_tokens=300,
         )
         answer = response.choices[0].message.content.strip()
-        return {"answer": answer}
+
+        message = ChatMessage(
+            chat_session_id=payload.chat_session_id,
+            question=payload.query,
+            answer=answer,
+        )
+        db.add(message)
+        db.commit()
+        db.refresh(message)  # <- important to populate .id and .created_at
+
+        return AnswerResponse(
+            id=message.id,
+            question=message.question,
+            answer=message.answer,
+            created_at=message.created_at
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"OpenAI request failed: {str(e)}")

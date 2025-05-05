@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import UploadForm from "./components/UploadForm";
 import DocumentList from "./components/DocumentList";
 import ChatSidebar from "./components/ChatSidebar";
-
+import ChatHistory from "./components/ChatHistory";
 import AnswerForm, { AnswerFormHandle } from "./components/AnswerForm";
 import { useRef } from "react";
+
 
 
 
@@ -16,6 +17,8 @@ import {
 } from "./api-client/models/app__routers__document_router__DocumentOut";
 
 import { ChatSessionOut } from "./api-client/models/ChatSessionOut";
+import { ChatMessageOut } from "./api-client/models/ChatMessageOut";
+
 
 
 import {
@@ -29,6 +32,9 @@ function App() {
   const [documents, setDocuments] = useState<DocumentOut[]>([]);
   const [chatSessions, setChatSessions] = useState<ChatSessionOut[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const [chatMessages, setChatMessages] = useState<ChatMessageOut[]>([]);
+
+  
 
   const fetchChats = async () => {
     try {
@@ -52,6 +58,12 @@ function App() {
     }
   };
 
+  const fetchMessages = async () => {
+    if (!selectedChatId) return;
+    const data = await ChatsService.getMessagesForChatChatsChatIdMessagesGet(selectedChatId);
+    setChatMessages(data);
+  };
+
   const handleDelete = async (id: string) => {
     await DocumentsService.deleteDocumentDocumentsDocIdDelete(id);
     fetchDocuments();
@@ -62,6 +74,9 @@ function App() {
     setSelectedChatId(newChat.id);
   };
 
+  const handleNewMessage = (newMsg: ChatMessageOut) => {
+    setChatMessages((prev) => [...prev, newMsg]);
+  };  
   useEffect(() => {
     fetchChats();
   }, []);
@@ -69,9 +84,12 @@ function App() {
   useEffect(() => {
     if (selectedChatId) {
       fetchDocuments();
+      fetchMessages();
+
       answerFormRef.current?.reset(); 
     }
   }, [selectedChatId]);
+
   
 
   return (
@@ -88,7 +106,14 @@ function App() {
           <>
             <UploadForm onUploadSuccess={fetchDocuments} chatId={selectedChatId} />
             <DocumentList documents={documents} onDelete={handleDelete} />
-            <AnswerForm chatId={selectedChatId} ref={answerFormRef} />
+            <ChatHistory messages={chatMessages} />
+            <AnswerForm
+            chatId={selectedChatId}
+            ref={answerFormRef}
+            onMessage={handleNewMessage}
+            />
+
+
 
           </>
         ) : (
