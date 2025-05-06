@@ -103,3 +103,5 @@ def get_messages_for_chat(chat_id: UUID):
     )
     for msg in sorted(chat.messages, key=lambda m: m.created_at)
     ]
+
+

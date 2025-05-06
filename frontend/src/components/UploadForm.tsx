@@ -1,39 +1,27 @@
 import { useRef, useState } from "react";
-import axios from "axios";
+import { UploadService } from "../api-client";
 
 type UploadFormProps = {
   onUploadSuccess: () => void;
   chatId: string;
 };
 
-/**
- * Compact “+” button that uploads a PDF immediately after the user
- * picks a file (no second confirmation needed).
- */
+/** Tiny “+” button that uploads immediately after file selection */
 function UploadForm({ onUploadSuccess, chatId }: UploadFormProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleFileSelect = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !chatId) return;
+    if (!file) return;
 
     setLoading(true);
-
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      await axios.post(
-        `http://localhost:8000/upload/?chat_session_id=${chatId}`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-      onUploadSuccess();           // refresh doc list
-    } catch {
-      console.error("Upload failed");
+      /* the OpenAPI client transforms this object to multipart/form‑data */
+      await UploadService.uploadDocumentUploadPost(chatId, { file } as any);
+      onUploadSuccess();
+    } catch (err) {
+      console.error("Upload failed", err);
     } finally {
       setLoading(false);
       if (inputRef.current) inputRef.current.value = "";

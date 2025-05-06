@@ -1,15 +1,23 @@
 import { useState } from "react";
+import { ChatsService } from "../api-client";
 import { ChatSessionOut } from "../api-client/models/ChatSessionOut";
+import { ChatSessionCreate } from "../api-client/models/ChatSessionCreate";
 
-
-type ChatSidebarProps = {
+type Props = {
   chats: ChatSessionOut[];
   selectedChatId: string | null;
-  onSelect: (id: string) => void;
-  onNewChat: (chat: ChatSessionOut) => void; // callback when a chat is created
+  onSelect: (id: string | null) => void;
+  onNewChat: (chat: ChatSessionOut) => void;
+  onDeleteChat: (id: string) => void;
 };
 
-function ChatSidebar({ chats, selectedChatId, onSelect, onNewChat }: ChatSidebarProps) {
+function ChatSidebar({
+  chats,
+  selectedChatId,
+  onSelect,
+  onNewChat,
+  onDeleteChat,
+}: Props) {
   const [creating, setCreating] = useState(false);
   const [chatName, setChatName] = useState("");
 
@@ -17,13 +25,9 @@ function ChatSidebar({ chats, selectedChatId, onSelect, onNewChat }: ChatSidebar
     if (!chatName.trim()) return;
     setCreating(true);
     try {
-      const res = await fetch("http://localhost:8000/chats/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: chatName }),
-      });
-
-      const newChat = await res.json();
+      const newChat = await ChatsService.createChatSessionChatsPost({
+        name: chatName,
+      } as ChatSessionCreate);
       onNewChat(newChat);
       onSelect(newChat.id);
       setChatName("");
@@ -31,6 +35,15 @@ function ChatSidebar({ chats, selectedChatId, onSelect, onNewChat }: ChatSidebar
       console.error("Failed to create chat", err);
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleDeleteChat = async (id: string) => {
+    try {
+      await ChatsService.deleteChatSessionChatsChatIdDelete(id);
+      onDeleteChat(id);
+    } catch (err) {
+      console.error("Failed to delete chat", err);
     }
   };
 
@@ -42,14 +55,25 @@ function ChatSidebar({ chats, selectedChatId, onSelect, onNewChat }: ChatSidebar
         {chats.map((chat) => (
           <li
             key={chat.id}
-            onClick={() => onSelect(chat.id)}
-            className={`cursor-pointer p-2 rounded ${
+            className={`group p-2 rounded flex justify-between items-center cursor-pointer ${
               chat.id === selectedChatId
                 ? "bg-blue-100 text-blue-700 font-medium"
                 : "hover:bg-gray-100"
             }`}
           >
-            {chat.name}
+            <span
+              onClick={() => onSelect(chat.id)}
+              className="truncate flex-1"
+            >
+              {chat.name}
+            </span>
+            <button
+              onClick={() => handleDeleteChat(chat.id)}
+              className="text-red-500 hover:text-red-700 ml-2 text-xs hidden group-hover:inline"
+              title="Delete chat"
+            >
+              ✕
+            </button>
           </li>
         ))}
       </ul>

@@ -4,98 +4,99 @@ import ChatSidebar from "./components/ChatSidebar";
 import ChatHistory from "./components/ChatHistory";
 import AnswerForm, { AnswerFormHandle } from "./components/AnswerForm";
 
-import {
-  app__routers__document_router__DocumentOut as DocumentOut,
-} from "./api-client/models/app__routers__document_router__DocumentOut";
+import { ChatsService, DocumentsService } from "./api-client";
 import { ChatSessionOut } from "./api-client/models/ChatSessionOut";
 import { ChatMessageOut } from "./api-client/models/ChatMessageOut";
-
-import {
-  ChatsService,
-  DocumentsService,
-} from "./api-client";
+import { app__routers__chat_router__DocumentOut as DocumentOut } from "./api-client/models/app__routers__chat_router__DocumentOut";
 
 function App() {
   const answerFormRef = useRef<AnswerFormHandle>(null);
-  const [documents, setDocuments] = useState<DocumentOut[]>([]);
-  const [chatSessions, setChatSessions] = useState<ChatSessionOut[]>([]);
+
+  const [chats, setChats] = useState<ChatSessionOut[]>([]);
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
-  const [chatMessages, setChatMessages] = useState<ChatMessageOut[]>([]);
+  const [documents, setDocuments] = useState<DocumentOut[]>([]);
+  const [messages, setMessages] = useState<ChatMessageOut[]>([]);
 
-  /* -------- fetch helpers -------- */
-  const fetchChats = async () => {
+  /* ---------- data fetch ---------- */
+  const loadChats = async () => {
     const data = await ChatsService.listChatSessionsChatsGet();
-    setChatSessions(data);
-    if (!selectedChatId && data.length > 0) setSelectedChatId(data[0].id);
+    setChats(data);
+    if (!selectedChatId && data.length) setSelectedChatId(data[0].id);
   };
 
-  const fetchDocuments = async () => {
-    if (!selectedChatId) return;
-    const data =
-      await ChatsService.getDocumentsForChatChatsChatIdDocumentsGet(
-        selectedChatId
+  const loadDocuments = async () => {
+    if (selectedChatId)
+      setDocuments(
+        await ChatsService.getDocumentsForChatChatsChatIdDocumentsGet(
+          selectedChatId,
+        ),
       );
-    setDocuments(data);
   };
 
-  const fetchMessages = async () => {
-    if (!selectedChatId) return;
-    const data =
-      await ChatsService.getMessagesForChatChatsChatIdMessagesGet(
-        selectedChatId
+  const loadMessages = async () => {
+    if (selectedChatId)
+      setMessages(
+        await ChatsService.getMessagesForChatChatsChatIdMessagesGet(
+          selectedChatId,
+        ),
       );
-    setChatMessages(data);
   };
 
-  /* -------- actions -------- */
-  const handleDelete = async (id: string) => {
-    await DocumentsService.deleteDocumentDocumentsDocIdDelete(id);
-    fetchDocuments();
+  /* ---------- handlers ---------- */
+  const handleNewChat = (chat: ChatSessionOut) => {
+    setChats((c) => [chat, ...c]);
+    setSelectedChatId(chat.id);
   };
 
-  const handleNewChat = (newChat: ChatSessionOut) => {
-    setChatSessions((prev) => [newChat, ...prev]);
-    setSelectedChatId(newChat.id);
+  const handleDeleteChat = (id: string) => {
+    setChats((c) => c.filter((chat) => chat.id !== id));
+    if (selectedChatId === id) setSelectedChatId(null);
   };
 
-  const handleNewMessage = (newMsg: ChatMessageOut) => {
-    setChatMessages((prev) => [...prev, newMsg]);
+  const handleNewMessage = (msg: ChatMessageOut) =>
+    setMessages((m) => [...m, msg]);
+
+  const handleDeleteDocument = async (docId: string) => {
+    await DocumentsService.deleteDocumentDocumentsDocIdDelete(docId);
+    loadDocuments();
   };
 
-  /* -------- life‑cycle -------- */
+  /* ---------- effects ---------- */
   useEffect(() => {
-    fetchChats();
+    loadChats();
   }, []);
 
   useEffect(() => {
-    if (selectedChatId) {
-      fetchDocuments();
-      fetchMessages();
-      answerFormRef.current?.reset();
+    if (!selectedChatId) {
+      setDocuments([]);
+      setMessages([]);
+      return;
     }
+    loadDocuments();
+    loadMessages();
+    answerFormRef.current?.reset();
   }, [selectedChatId]);
 
-  /* -------- UI -------- */
+  /* ---------- UI ---------- */
   return (
     <div className="h-screen flex overflow-hidden">
       <ChatSidebar
-        chats={chatSessions}
+        chats={chats}
         selectedChatId={selectedChatId}
         onSelect={setSelectedChatId}
         onNewChat={handleNewChat}
+        onDeleteChat={handleDeleteChat}
       />
 
       <div className="flex-1 flex flex-col bg-gray-50">
         {selectedChatId ? (
           <>
-            {/* conversation area */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              <ChatHistory messages={chatMessages} />
+              <ChatHistory messages={messages} />
             </div>
 
-            {/* bottom panel */}
             <div className="border-t p-4 bg-white space-y-2">
-              {/* doc chips + plus button */}
+              {/* document chips + “+” upload */}
               <div className="flex justify-between items-center flex-wrap gap-2">
                 <div className="flex flex-wrap gap-2">
                   {documents.map((doc) => (
@@ -107,7 +108,7 @@ function App() {
                         {doc.name}
                       </span>
                       <button
-                        onClick={() => handleDelete(doc.id)}
+                        onClick={() => handleDeleteDocument(doc.id)}
                         className="text-red-500 hover:text-red-700 text-xs"
                       >
                         ✕
@@ -117,7 +118,7 @@ function App() {
                 </div>
 
                 <UploadForm
-                  onUploadSuccess={fetchDocuments}
+                  onUploadSuccess={loadDocuments}
                   chatId={selectedChatId}
                 />
               </div>
@@ -131,7 +132,7 @@ function App() {
           </>
         ) : (
           <div className="m-auto text-gray-600">
-            Please select a chat session.
+            Please select or create a chat.
           </div>
         )}
       </div>

@@ -5,7 +5,6 @@ type ChatHistoryProps = {
 };
 
 function ChatHistory({ messages }: ChatHistoryProps) {
-    console.log("Browser time zone:", Intl.DateTimeFormat().resolvedOptions().timeZone);
     
 
   return (

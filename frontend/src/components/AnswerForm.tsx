@@ -1,24 +1,23 @@
-import { useState, forwardRef, useImperativeHandle } from "react";
-import axios from "axios";
+import { forwardRef, useImperativeHandle, useState } from "react";
+import { AnswerService } from "../api-client";
 import { ChatMessageOut } from "../api-client/models/ChatMessageOut";
+import { AnswerRequest } from "../api-client/models/AnswerRequest";
 
-type AnswerFormProps = {
+type Props = {
   chatId: string;
   onMessage: (msg: ChatMessageOut) => void;
 };
 
-export type AnswerFormHandle = {
-  reset: () => void;
-};
+export type AnswerFormHandle = { reset: () => void };
 
-const AnswerForm = forwardRef<AnswerFormHandle, AnswerFormProps>(
+const AnswerForm = forwardRef<AnswerFormHandle, Props>(
   ({ chatId, onMessage }, ref) => {
     const [question, setQuestion] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
     useImperativeHandle(ref, () => ({
-      reset: () => {
+      reset() {
         setQuestion("");
         setError("");
       },
@@ -26,27 +25,31 @@ const AnswerForm = forwardRef<AnswerFormHandle, AnswerFormProps>(
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!question.trim() || !chatId) return;
+      if (!question.trim()) return;
 
       setLoading(true);
       setError("");
 
       try {
-        const response = await axios.post<ChatMessageOut>(
-          "http://localhost:8000/answer/",
-          {
-            query: question,
-            top_k: 3,
-            chat_session_id: chatId,
-          }
-        );
+        const payload: AnswerRequest = {
+          query: question,
+          top_k: 3,
+          chat_session_id: chatId,
+        } as unknown as AnswerRequest;
 
-        const newMessage = response.data;
-        onMessage(newMessage);
+        const res = await AnswerService.generateAnswerAnswerPost(payload);
+        onMessage({
+          id: res.id,
+          question: res.question,
+          answer: res.answer,
+          created_at: res.created_at,
+          sources: res.sources,
+        } as ChatMessageOut);
+
         setQuestion("");
       } catch (err) {
         console.error(err);
-        setError("❌ Failed to generate answer. Try again.");
+        setError("❌ Failed to generate answer.");
       } finally {
         setLoading(false);
       }
@@ -73,17 +76,19 @@ const AnswerForm = forwardRef<AnswerFormHandle, AnswerFormProps>(
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-green-600 hover:bg-green-700"
               }
-              ${!question.trim() && !loading ? "opacity-50 cursor-not-allowed" : ""}
-            `}
+              ${
+                !question.trim() && !loading
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              }`}
           >
-            {loading ? "Thinking..." : "Send"}
+            {loading ? "Thinking…" : "Send"}
           </button>
         </div>
-
         {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
       </form>
     );
-  }
+  },
 );
 
 export default AnswerForm;
