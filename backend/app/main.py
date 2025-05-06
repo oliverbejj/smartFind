@@ -1,5 +1,5 @@
 from fastapi import FastAPI # type: ignore
-from app.routers import upload_router, system_router, answer_router, document_router, chat_router
+from app.routers import upload_router, answer_router, document_router, chat_router, health_router
 from app.db.database import init_db
 
 
@@ -24,7 +24,7 @@ app.add_middleware(
 
 
 
-app.include_router(system_router.router, prefix="", tags=["System"])
+app.include_router(health_router.router, prefix="/health", tags=["Health"])
 app.include_router(upload_router.router, prefix="/upload", tags=["Upload"])
 app.include_router(answer_router.router, prefix="/answer", tags=["Answer"])
 app.include_router(document_router.router, prefix="/documents", tags=["Documents"])

@@ -1,10 +1,6 @@
-version: '3.9'
-
 services:
   db:
     image: postgres:16
-    container_name: smartfind-db
-    restart: unless-stopped
     environment:
       POSTGRES_USER: smartfind
       POSTGRES_PASSWORD: smartfind
@@ -13,31 +9,25 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: smartfind-backend
+    build: ./backend
+    env_file: .env
     depends_on:
       - db
-    env_file:              
-      - .env
     ports:
       - "8000:8000"
-    volumes:
-      - ./backend/app:/app/app
-      - ./backend/requirements.txt:/app/requirements.txt
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -f -L http://localhost:8000/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: smartfind-frontend
+    build: ./frontend
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     ports:
       - "5173:4173"
-    restart: unless-stopped
 
 volumes:
   pgdata:

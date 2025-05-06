@@ -1,31 +1,21 @@
-# Use official Node image to build the app
-FROM node:20-alpine AS builder
-
-# Set working directory
+FROM node:20-alpine
 WORKDIR /app
 
-# Install dependencies
-COPY package.json package-lock.json ./
-RUN npm install
+# ➊ curl is required for the wait‑loop in entrypoint.sh
+RUN apk add --no-cache curl
 
-# Copy source and build
+# ➋ install deps
+COPY package*.json ./
+RUN npm install -g openapi-typescript-codegen serve && npm ci
+
+# ➌ copy the actual source AFTER deps
 COPY . .
-RUN npm run build
 
-# Use a lightweight web server to serve the built files
-FROM node:20-alpine AS runner
+# ➍ copy the entrypoint
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-WORKDIR /app
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD \
+  curl -sSf http://localhost:4173 || exit 1
 
-# Install Vite for preview serving
-RUN npm install -g serve
-
-# Copy built files from builder stage
-COPY --from=builder /app/dist ./dist
-
-# Expose port used by Vite preview or serve
-EXPOSE 4173
-
-# Start the preview server
-CMD ["serve", "-s", "dist", "-l", "4173"]
-
+ENTRYPOINT ["/entrypoint.sh"]
