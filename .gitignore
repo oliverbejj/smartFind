@@ -14,3 +14,7 @@ venv/
 
 # VSCode (if you use it)
 .vscode/
+
+# ignore generated OpenAPI client
+/frontend/src/api-client/
+

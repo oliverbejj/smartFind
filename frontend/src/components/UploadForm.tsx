@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import axios from "axios";
 
 type UploadFormProps = {
@@ -6,82 +6,56 @@ type UploadFormProps = {
   chatId: string;
 };
 
+/**
+ * Compact “+” button that uploads a PDF immediately after the user
+ * picks a file (no second confirmation needed).
+ */
 function UploadForm({ onUploadSuccess, chatId }: UploadFormProps) {
-  const [file, setFile] = useState<File | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleFileSelect = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
     if (!file || !chatId) return;
 
     setLoading(true);
-    setMessage(null);
 
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const response = await axios.post(
+      await axios.post(
         `http://localhost:8000/upload/?chat_session_id=${chatId}`,
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
-      setMessage(`${response.data.message}`);
-      setFile(null);
-      if (inputRef.current) inputRef.current.value = "";
-      onUploadSuccess();
-    } catch (err) {
-      setMessage("❌ Upload failed.");
+      onUploadSuccess();           // refresh doc list
+    } catch {
+      console.error("Upload failed");
     } finally {
       setLoading(false);
+      if (inputRef.current) inputRef.current.value = "";
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-2xl shadow max-w-md mx-auto mb-8 flex flex-col gap-4"
+    <label
+      className={`cursor-pointer inline-flex items-center justify-center w-8 h-8 rounded-full text-xl font-bold transition
+        ${loading ? "bg-gray-300 cursor-wait" : "bg-blue-100 hover:bg-blue-200"}`}
+      title={loading ? "Uploading…" : "Upload PDF"}
     >
-      <h2 className="text-xl font-semibold">Upload a PDF</h2>
-
+      {loading ? "…" : "+"}
       <input
         ref={inputRef}
         type="file"
         accept=".pdf"
-        onChange={(e) => setFile(e.target.files?.[0] || null)}
+        onChange={handleFileSelect}
         disabled={loading}
-        className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+        className="hidden"
       />
-
-      <button
-        type="submit"
-        disabled={loading}
-        className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white font-medium ${
-          loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-        }`}
-      >
-        {loading ? (
-          <svg
-            className="w-4 h-4 animate-spin"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-          >
-            <circle className="opacity-25" cx="12" cy="12" r="10" strokeWidth="4" />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v8H4z"
-            />
-          </svg>
-        ) : null}
-        {loading ? "Processing..." : "Upload"}
-      </button>
-
-      {message && <p className="text-sm text-gray-700">{message}</p>}
-    </form>
+    </label>
   );
 }
 
