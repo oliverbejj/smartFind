@@ -21,6 +21,7 @@
 ```
 .
 ├── backend/
+|   ├── Dockerfile
 │   ├── app/
 │   │   ├── db/
 │   │   │   ├── crud.py
@@ -44,6 +45,7 @@
 │   │   └── main.py
 ├── frontend/
 │   ├── App.tsx
+|   ├── Dockerfile
 │   ├── components/
 │   │   ├── AnswerForm.tsx
 │   │   ├── AuthContext.tsx
@@ -53,10 +55,7 @@
 │   │   ├── DocumentList.tsx
 │   │   ├── SearchForm.tsx
 │   │   └── UploadForm.tsx
-├── docker/
-│   ├── Dockerfile.backend
-│   ├── Dockerfile.frontend
-│   └── docker-compose.yml
+├── docker-compose.yml
 ├── Makefile
 └── README.md
 ```
