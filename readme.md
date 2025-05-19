@@ -1,63 +1,142 @@
-# 🧠 SmartFind — AI-Powered Document Q&A App
+# SmartFind
 
-SmartFind is a full-stack AI application that lets users upload PDF documents and interact with them via natural language questions. It extracts, embeds, and indexes document content using semantic search, then returns clear, GPT-generated answers based on the most relevant text chunks.
-
-Built for developers and learners who want real-world AI, backend, and frontend experience — from embeddings to user conversations.
+**SmartFind** is an AI-powered document search engine that allows users to upload PDFs, extract and embed their contents, and perform semantic search through chat-based interactions. Built with FastAPI, PostgreSQL, OpenAI embeddings, and a React frontend.
 
 ---
 
-## ✨ Features
+## 🚀 Features
 
-- 📄 **Upload PDFs** and have them processed into searchable chunks
-- 💬 **Ask natural language questions** and get relevant, clean answers
-- 🧠 **Embeddings + semantic search** via OpenAI for accurate context retrieval
-- 🗃️ **Chat sessions** with independent histories and context
-- ⚡ **React + Tailwind frontend** with dynamic chat & document UI
-- 🐍 **FastAPI backend** with OpenAPI integration and SQLAlchemy ORM
-- 🐳 **One-command Docker setup** via `make up`
-- 🔐 Ready for future features like auth, multi-user support, and more
-
----
-
-## 🧱 Tech Stack
-
-| Layer       | Tech                             |
-|-------------|----------------------------------|
-| **Frontend**  | React, Vite, TailwindCSS, Axios |
-| **Backend**   | FastAPI, SQLAlchemy, OpenAPI    |
-| **AI / Search** | OpenAI Embeddings, cosine similarity |
-| **DB**        | Postgres |
-| **Infra**     | Docker, Makefile                |
+- 🔐 User Authentication with JWT
+- 📄 PDF Upload and Processing
+- 📚 Chunking and Embedding with OpenAI
+- 💬 Chat Interface for Semantic Q&A
+- 🧠 GPT-3.5 Turbo Answer Generation
+- 🧾 Document and Chat Session Management
+- 🌐 Fully containerized with Docker and Makefile automation
 
 ---
 
-## 🧠 How It Works
+## 📦 Project Structure
 
-1. **Upload a PDF**  
-   → Extracted + split into sentences or chunks (max characters)
-
-2. **Embed with OpenAI**  
-   → Chunks converted to embedding vectors and stored in DB
-
-3. **Ask a question**  
-   → User input embedded → top chunks found via cosine similarity
-
-4. **Final GPT filter**  
-   → Top chunk passed to GPT to polish and return clean answer
-
-5. **Conversation memory**  
-   → Each Q&A saved under a specific chat session, retrievable later
+```
+.
+├── backend/
+│   ├── app/
+│   │   ├── db/
+│   │   │   ├── crud.py
+│   │   │   ├── database.py
+│   │   │   └── models.py
+│   │   ├── models/
+│   │   │   ├── embedder.py
+│   │   │   ├── pdf_reader.py
+│   │   │   └── text_splitter.py
+│   │   ├── routers/
+│   │   │   ├── answer_router.py
+│   │   │   ├── auth_router.py
+│   │   │   ├── chat_router.py
+│   │   │   ├── document_router.py
+│   │   │   ├── upload_router.py
+│   │   │   └── health_router.py
+│   │   ├── services/
+│   │   │   └── db_storage_service.py
+│   │   ├── core/
+│   │   │   └── config.py
+│   │   └── main.py
+├── frontend/
+│   ├── App.tsx
+│   ├── components/
+│   │   ├── AnswerForm.tsx
+│   │   ├── AuthContext.tsx
+│   │   ├── AuthModal.tsx
+│   │   ├── ChatHistory.tsx
+│   │   ├── ChatSidebar.tsx
+│   │   ├── DocumentList.tsx
+│   │   ├── SearchForm.tsx
+│   │   └── UploadForm.tsx
+├── docker/
+│   ├── Dockerfile.backend
+│   ├── Dockerfile.frontend
+│   └── docker-compose.yml
+├── Makefile
+└── README.md
+```
 
 ---
 
-## 🚀 Getting Started
+## 🛠️ Getting Started
 
-### 🔧 Prerequisites
+### Prerequisites
 
-- Docker
-- OpenAI API key (`OPENAI_API_KEY` in `.env`)
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+- [Make](https://www.gnu.org/software/make/)
 
-### 🏁 Quickstart
+### Environment Variables
 
-```bash
+Create a `.env` file in the root with the following:
+
+```
+OPENAI_API_KEY=your_openai_api_key
+JWT_SECRET_KEY=your_jwt_secret
+DATABASE_URL=postgresql+psycopg2://smartfind:smartfind@db/smartfind
+```
+
+---
+
+## 🔧 Running the Project
+
+Simply run:
+
+```
 make up
+```
+
+This will:
+
+- Build and start the FastAPI backend
+- Serve the React frontend (typically on `http://localhost:5173`)
+- Set up the PostgreSQL database with appropriate tables
+
+---
+
+## 🧪 API Endpoints
+
+FastAPI Swagger UI is available at:
+
+```
+http://localhost:8000/docs
+```
+
+Includes endpoints for:
+
+- `/auth` – Register/Login
+- `/upload` – PDF Upload
+- `/answer` – Semantic Question Answering
+- `/documents` – List/Delete documents
+- `/chats` – Manage sessions and messages
+- `/health` – Health check
+
+---
+
+## 📋 Makefile Targets
+
+| Command     | Description                       |
+|-------------|-----------------------------------|
+| `make up`   | Build and run full stack          |
+| `make down` | Stop and remove containers        |
+
+---
+
+## 📄 License
+
+MIT License
+
+---
+
+## 🧠 Acknowledgements
+
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [OpenAI](https://openai.com/)
+- [React](https://reactjs.org/)
+- [PostgreSQL](https://www.postgresql.org/)
+- This readme was generated using ChatGPT 4o
